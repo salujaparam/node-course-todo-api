@@ -1,11 +1,12 @@
 var mongoose = require('mongoose');
 
 
-const dbuser = 'param';
-const dbpassword = 'stoneparam12';
+
 mongoose.Promise = global.Promise;
 
-mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost:27017/TodoApp');
+const uri = "mongodb://param:stoneparam12@ds243502.mlab.com:43502/todoapp";
+
+mongoose.connect(uri || 'mongodb://localhost:27017/TodoApp');
 module.exports = {
   mongoose
 };
