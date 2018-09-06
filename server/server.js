@@ -8,10 +8,10 @@ const {ObjectID} = require('mongodb');
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
-var {authenticate} = require('middleware/authenticate');
+var {authenticate} = require('./middleware/authenticate');
 
 var app = express();
-const  port = process.env.PORT;
+const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
@@ -29,24 +29,22 @@ app.post('/todos', (req, res) => {
 
 app.get('/todos', (req, res) => {
   Todo.find().then((todos) => {
-    res.send({todos})
+    res.send({todos});
   }, (e) => {
     res.status(400).send(e);
   });
 });
 
-
-// GET /todos/ 132321
-
 app.get('/todos/:id', (req, res) => {
   var id = req.params.id;
 
-  if(!ObjectID.isValid(id)){
-    return res.status(404).send({});
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send();
   }
+
   Todo.findById(id).then((todo) => {
-    if(!todo){
-      return res.status(400).send();
+    if (!todo) {
+      return res.status(404).send();
     }
 
     res.send({todo});
@@ -58,12 +56,12 @@ app.get('/todos/:id', (req, res) => {
 app.delete('/todos/:id', (req, res) => {
   var id = req.params.id;
 
-  if(!ObjectID.isValid(id)){
+  if (!ObjectID.isValid(id)) {
     return res.status(404).send();
   }
 
   Todo.findByIdAndRemove(id).then((todo) => {
-    if(!todo){
+    if (!todo) {
       return res.status(404).send();
     }
 
@@ -99,11 +97,10 @@ app.patch('/todos/:id', (req, res) => {
   })
 });
 
+// POST /users
 app.post('/users', (req, res) => {
   var body = _.pick(req.body, ['email', 'password']);
   var user = new User(body);
-
-
 
   user.save().then(() => {
     return user.generateAuthToken();
@@ -114,39 +111,12 @@ app.post('/users', (req, res) => {
   })
 });
 
-
-
-app.get('/users/me', authenticate, (req,res) => {
-  res.send(req.user)
+app.get('/users/me', authenticate, (req, res) => {
+  res.send(req.user);
 });
 
 app.listen(port, () => {
-  console.log(`Started on port ${port}`);
+  console.log(`Started up at port ${port}`);
 });
 
-
 module.exports = {app};
-
-
-// var newTodo = new Todo({
-//   text: 'Cook Dinner'
-// });
-
-// newTodo.save().then((doc) => {
-//   console.log('saved todo', doc);
-// }, (e) => {
-//   console.log('unable to save todo');
-// });
-
-
-
-
-// var newUser = new User({
-//   email: 'salujaparam@gmail.com'
-// });
-//
-// newUser.save().then((doc) => {
-//   console.log(JSON.stringify(doc, undefined, 2));
-// }, (e) => {
-//   console.log('error');
-// });
